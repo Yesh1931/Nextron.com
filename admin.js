@@ -3,8 +3,8 @@
  * Route: #/admin
  */
 
-import { AppState } from '../app.js';
-import { GLOSSARY, QUIZ_BANK } from '../database.js';
+import { AppState } from './app.js';
+import { GLOSSARY, QUIZ_BANK } from './database.js';
 
 // --- Static Default System State Init ---
 const DEFAULT_ACHIEVEMENTS = [
