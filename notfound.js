@@ -3,7 +3,7 @@
  * Route: Any unmatched hash URL
  */
 
-import { AppState } from '../app.js';
+import { AppState } from './app.js';
 
 // --- Static Data for Smart Search Indexing ---
 const SEARCH_DATABASE = [
