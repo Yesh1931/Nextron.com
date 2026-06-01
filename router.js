@@ -61,7 +61,7 @@ export class Router {
             matchedRoute = this.routes.find(r => r.path === '#/404') || {
                 path: '#/404',
                 name: 'notfound',
-                loadView: () => import('./views/notfound.js')
+                loadView: () => import('./notfound.js')
             };
         }
 
@@ -88,7 +88,7 @@ export class Router {
         if (!isInvalidRoute && ROUTE_TO_CONCEPT_MAP[routePath]) {
             const conceptId = ROUTE_TO_CONCEPT_MAP[routePath];
             try {
-                const { isSubjectLocked } = await import('./views/concepts.js');
+                const { isSubjectLocked } = await import('./concepts.js');
                 const AppState = window.AppState;
                 
                 if (AppState && isSubjectLocked(conceptId)) {
