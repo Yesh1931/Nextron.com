@@ -2,7 +2,7 @@
  * Nextron - Fullscreen Login & Signup View
  */
 
-import { AppState } from '../app.js';
+import { AppState } from './app.js';
 
 const COLLEGES_INDIAN = [
     "Indian Institute of Technology, Bombay (IIT Bombay)",
