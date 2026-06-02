@@ -38,10 +38,15 @@ let db = null;
 if (isFirebaseActive) {
     try {
         // Dynamic ESM imports of Firebase CDN SDKs
-        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
-        const { getAuth } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
-        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 
+            import { getAuth }
+            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+            import { getFirestore }
+            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
