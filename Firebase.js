@@ -1,58 +1,24 @@
 /**
- * Nextron - Firebase Configuration & Initialization
- * 
- * If valid API keys are supplied here, the platform automatically connects to Firestore.
- * Otherwise, it falls back to Local Mock Mode using localStorage and static files.
+ * Firebase Configuration
  */
 
-// Replace these placeholders with your actual Firebase project settings
-// Import the functions you need from the SDKs you need
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-import { getAuth }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-import { getFirestore }
-from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyA4Xd4LMrMAOAMk-euuDY6zd4jfcmtzQ5U",
-    authDomain: "nextron-48514.firebaseapp.com",
-    projectId: "nextron-48514",
-    storageBucket: "nextron-48514.firebasestorage.app",
-    messagingSenderId: "93642127644",
-    appId: "1:93642127644:web:38a9ceb2aa1252f8dc62d9",
-    measurementId: "G-EL09LP2BNN"
+  apiKey: "AIzaSyA4Xd4LMrMAOAMk-euuDY6zd4jfcmtzQ5U",
+  authDomain: "nextron-48514.firebaseapp.com",
+  projectId: "nextron-48514",
+  storageBucket: "nextron-48514.appspot.com",
+  messagingSenderId: "93642127644",
+  appId: "1:93642127644:web:38a9ceb2aa1252f8dc62d9",
+  measurementId: "G-EL09LP2BNN"
 };
 
-// Check if credentials have been replaced
-export const isFirebaseActive =
-    firebaseConfig.apiKey &&
-    firebaseConfig.apiKey !== "[GCP_API_KEY]" &&
-    firebaseConfig.apiKey.trim() !== "[GCP_API_KEY]";
+const app = initializeApp(firebaseConfig);
 
-let app = null;
-let auth = null;
-let db = null;
-
-if (isFirebaseActive) {
-    try {
-        app = initializeApp(firebaseConfig);
-
-        auth = getAuth(app);
-
-        db = getFirestore(app);
-        console.log("⚡ Firebase successfully initialized and connected to Firestore.");
-    } catch (err) {
-        console.error("❌ Failed to initialize Firebase: ", err);
-    }
-} else {
-    console.warn("⚠️ Firebase configuration missing. ECE Platform running in LOCAL MOCK MODE (localStorage).");
-}
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 export { app, auth, db };
