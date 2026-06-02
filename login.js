@@ -3,7 +3,7 @@
  */
 
 import { AppState } from './app.js';
-import { auth, db } from "./Firebase.js";
+import { auth, db, isFirebaseActive } from "./Firebase.js";
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -300,7 +300,6 @@ export const mount = () => {
         const googleLoginBtn = document.getElementById('googleLogin');
         if (googleLoginBtn) {
             googleLoginBtn.addEventListener('click', async () => {
-                import { auth, db, isFirebaseActive } from "./Firebase.js";
                 if (isFirebaseActive) {
                     try {
                         const result = await signInWithPopup(auth, provider);
