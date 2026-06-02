@@ -1,60 +1,55 @@
-// ==========================================
-// NEXTRON ELECTRONICS PLATFORM - FIREBASE ENGINE
-// ==========================================
-//
-// This file manages connection to your Firebase active real-time database.
-// 
-// HOW TO CONFIGURE:
-// 1. Visit the Firebase Console (https://console.firebase.google.com/)
-// 2. Click "Add Project" and name it "ece-nextron"
-// 3. Under project settings, click the "</>" icon to register a Web App
-// 4. Copy the generated `firebaseConfig` object and paste it below.
-//
-// MODULE IMPORT MODES:
-// - NPM MODE (Recommended for standard Vite / Node environments):
-//   Uncomment the "NPM-BASED IMPORTS" block and comment out the "CDN-BASED IMPORTS" block below.
-// - CDN MODE (Zero-setup browser-native ESM mode):
-//   Uses high-performance Google CDN links directly in the browser. Works instantly!
+/**
+ * Nextron - Firebase Configuration & Initialization
+ * 
+ * If valid API keys are supplied here, the platform automatically connects to Firestore.
+ * Otherwise, it falls back to Local Mock Mode using localStorage and static files.
+ */
 
-// --- OPTION A: CDN-BASED IMPORTS (Default - Works immediately without npm install) ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// Replace these placeholders with your actual Firebase project settings
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-// --- OPTION B: NPM-BASED IMPORTS (Uncomment if you ran 'npm install' locally) ---
-// import { initializeApp } from "firebase/app";
-// import { getAuth } from "firebase/auth";
-// import { getFirestore } from "firebase/firestore";
-
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyA4Xd4LMrMAOAMk-euuDY6zd4jfcmtzQ5U", // Paste your Firebase API Key here (e.g. "AIzaSy...")
-    authDomain: "ece-nextron.firebaseapp.com",
-    databaseURL: "https://ece-nextron-default-rtdb.firebaseio.com",
-    projectId: "ece-nextron",
-    storageBucket: "ece-nextron.firebasestorage.app",
-    messagingSenderId: "526914848913",
-    appId: "1:526914848913:web:9aa108371f766e9cd7db16"
+    apiKey: "AIzaSyA4Xd4LMrMAOAMk-euuDY6zd4jfcmtzQ5U",
+    authDomain: "nextron-48514.firebaseapp.com",
+    projectId: "nextron-48514",
+    storageBucket: "nextron-48514.firebasestorage.app",
+    messagingSenderId: "93642127644",
+    appId: "1:93642127644:web:38a9ceb2aa1252f8dc62d9",
+    measurementId: "G-EL09LP2BNN"
 };
 
-// Initialize Firebase dynamically if apiKey is provided
-let app = null;
-let authInstance = null;
-let dbInstance = null;
+// Check if credentials have been replaced
+export const isFirebaseActive =
+    firebaseConfig.apiKey &&
+    firebaseConfig.apiKey !== "[GCP_API_KEY]" &&
+    firebaseConfig.apiKey.trim() !== "[GCP_API_KEY]";
 
-if (firebaseConfig.apiKey) {
+let app = null;
+let auth = null;
+let db = null;
+
+if (isFirebaseActive) {
     try {
+        // Dynamic ESM imports of Firebase CDN SDKs
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+        const { getAuth } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+
         app = initializeApp(firebaseConfig);
-        authInstance = getAuth(app);
-        dbInstance = getFirestore(app);
-        console.log("📡 Firebase initialized successfully on ECE Nextron!");
-    } catch (e) {
-        console.error("❌ Firebase initialization failed. Check config parameters: ", e);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        console.log("⚡ Firebase successfully initialized and connected to Firestore.");
+    } catch (err) {
+        console.error("❌ Failed to initialize Firebase: ", err);
     }
 } else {
-    console.log("🔌 Nextron running in Local Persistent Telemetry mode (No Firebase apiKey configured).");
+    console.warn("⚠️ Firebase configuration missing. ECE Platform running in LOCAL MOCK MODE (localStorage).");
 }
 
-export const auth = authInstance;
-export const db = dbInstance;
-export const config = firebaseConfig;
-
+export { app, auth, db };
