@@ -8,7 +8,7 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     onAuthStateChanged
-} from "https://www.gstatic.com/Firebasejs/12.0.0/Firebase-auth.js";
+} from "firebase/auth";
 
 import {
     doc,
@@ -16,7 +16,7 @@ import {
     getDoc,
     collection,
     addDoc
-} from "https://www.gstatic.com/Firebasejs/12.0.0/Firebase-firestore.js";
+} from "firebase/firestore";
 
 const provider = new GoogleAuthProvider();
 
@@ -300,7 +300,7 @@ export const mount = () => {
         const googleLoginBtn = document.getElementById('googleLogin');
         if (googleLoginBtn) {
             googleLoginBtn.addEventListener('click', async () => {
-                const { isFirebaseActive } = await import('./Firebase.js');
+                import { auth, db, isFirebaseActive } from "./Firebase.js";
                 if (isFirebaseActive) {
                     try {
                         const result = await signInWithPopup(auth, provider);
