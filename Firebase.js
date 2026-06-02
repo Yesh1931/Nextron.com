@@ -42,18 +42,10 @@ let db = null;
 
 if (isFirebaseActive) {
     try {
-        // Dynamic ESM imports of Firebase CDN SDKs
-            import { initializeApp }
-            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-
-            import { getAuth }
-            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-            import { getFirestore }
-            from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
         app = initializeApp(firebaseConfig);
+
         auth = getAuth(app);
+
         db = getFirestore(app);
         console.log("⚡ Firebase successfully initialized and connected to Firestore.");
     } catch (err) {
