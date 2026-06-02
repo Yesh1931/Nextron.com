@@ -3,6 +3,30 @@
  */
 
 import { AppState } from './app.js';
+import { auth, db } from "./firebase-config.js";
+import {
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+import {
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const provider = new GoogleAuthProvider();
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("Logged In");
+    } else {
+        console.log("Logged Out");
+    }
+});
 
 const COLLEGES_INDIAN = [
     "Indian Institute of Technology, Bombay (IIT Bombay)",
@@ -79,6 +103,7 @@ const COLLEGES_INDIAN = [
     "R.V. College of Engineering, Bangalore (RVCE)",
     "BMS College of Engineering, Bangalore (BMSCE)",
     "MS Ramaiah Institute of Technology, Bangalore (MSRIT)",
+    "Mahindra University Hyderabad (MU)",
     "PES University, Bangalore",
     "College of Engineering, Pune (COEP)",
     "Veermata Jijabai Technological Institute, Mumbai (VJTI)",
@@ -186,6 +211,22 @@ export const render = async () => {
                         <button type="submit" class="auth-submit-btn" style="padding: 14px; font-size: 1rem;">Create Scholar Account</button>
                         <p class="auth-switch-prompt" style="margin-top: 24px;">Already a member? <span class="auth-switch-link" id="link-login-to-signin">Sign in here</span></p>
                     </form>
+
+                    <div style="display: flex; align-items: center; margin: 16px 0; color: var(--text-muted); font-size: 0.85rem;">
+                        <hr style="flex-grow: 1; border: none; border-top: 1px solid var(--border-color); margin-right: 12px;">
+                        <span>OR</span>
+                        <hr style="flex-grow: 1; border: none; border-top: 1px solid var(--border-color); margin-left: 12px;">
+                    </div>
+
+                    <button id="googleLogin" type="button" class="auth-submit-btn" style="padding: 12px; font-size: 0.95rem; background: rgba(255,255,255,0.06); color: var(--text-primary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer; transition: background 0.2s;">
+                        <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
                 </div>
             </div>
         </div>
@@ -199,7 +240,7 @@ export const mount = () => {
     const tabSignup = document.getElementById('tab-login-signup');
     const formSignin = document.getElementById('form-login-signin');
     const formSignup = document.getElementById('form-login-signup');
-    
+
     if (tabSignin && tabSignup && formSignin && formSignup) {
         // Toggle active tabs
         tabSignin.addEventListener('click', () => {
@@ -208,76 +249,128 @@ export const mount = () => {
             formSignin.style.display = 'block';
             formSignup.style.display = 'none';
         });
-        
+
         tabSignup.addEventListener('click', () => {
             tabSignup.classList.add('active');
             tabSignin.classList.remove('active');
             formSignup.style.display = 'block';
             formSignin.style.display = 'none';
         });
-        
+
         // Inline switch links
         const linkToSignup = document.getElementById('link-login-to-signup');
         const linkToSignin = document.getElementById('link-login-to-signin');
-        
+
         if (linkToSignup) linkToSignup.addEventListener('click', () => tabSignup.click());
         if (linkToSignin) linkToSignin.addEventListener('click', () => tabSignin.click());
-        
-        // Form submissions
-        formSignin.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = formSignin.querySelector('.auth-submit-btn');
-            const originalText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Authenticating...";
 
-            try {
-                const username = document.getElementById('login-signin-username').value.trim();
-                const password = document.getElementById('login-signin-password').value;
-                
-                const success = await AppState.loginUser(username, password);
-                if (success) {
-                    window.location.hash = '#/';
-                }
-            } catch (err) {
-                console.error("Login submission error: ", err);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
+        // Form submissions
+        formSignin.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-signin-username').value.trim();
+            const password = document.getElementById('login-signin-password').value;
+
+            const success = AppState.loginUser(username, password);
+            if (success) {
+                // Instantly navigate to home on successful authentication!
+                window.location.hash = '#/';
             }
         });
-        
-        formSignup.addEventListener('submit', async (e) => {
+
+        formSignup.addEventListener('submit', (e) => {
             e.preventDefault();
             const username = document.getElementById('login-signup-username').value.trim();
             const email = document.getElementById('login-signup-email').value.trim();
             const college = document.getElementById('login-signup-college').value.trim();
             const password = document.getElementById('login-signup-password').value;
-            
+
             if (password.length < 6) {
                 AppState.showToast("Password must be at least 6 characters long.", "error");
                 return;
             }
 
-            const submitBtn = formSignup.querySelector('.auth-submit-btn');
-            const originalText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Creating Account...";
-            
-            try {
-                const success = await AppState.registerUser(username, email, password, college);
-                if (success) {
-                    window.location.hash = '#/';
-                }
-            } catch (err) {
-                console.error("Signup submission error: ", err);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
+            const success = AppState.registerUser(username, email, password, college);
+            if (success) {
+                // Instantly navigate to home on successful registration!
+                window.location.hash = '#/';
             }
         });
+
+        // Google Login Listener
+        const googleLoginBtn = document.getElementById('googleLogin');
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', async () => {
+                const { isFirebaseActive } = await import('../firebase-config.js');
+                if (isFirebaseActive) {
+                    try {
+                        const result = await signInWithPopup(auth, provider);
+                        const user = result.user;
+
+                        await setDoc(
+                            doc(db, "users", user.uid),
+                            {
+                                name: user.displayName,
+                                email: user.email,
+                                photo: user.photoURL,
+                                createdAt: new Date()
+                            },
+                            { merge: true }
+                        );
+
+                        // Save to local student session
+                        let college = "Google Scholar";
+                        let username = user.displayName || user.email.split('@')[0];
+
+                        // Attempt to recover college info if user already exists
+                        try {
+                            const userSnap = await getDoc(doc(db, "users", user.uid));
+                            if (userSnap.exists()) {
+                                const data = userSnap.data();
+                                college = data.college || college;
+                            }
+                        } catch (e) { }
+
+                        AppState.currentUser = {
+                            username: username,
+                            email: user.email,
+                            college: college
+                        };
+                        localStorage.setItem('ece-current-user', JSON.stringify(AppState.currentUser));
+
+                        // Add activity log
+                        try {
+                            await addDoc(collection(db, "activityLogs"), {
+                                action: "User Login",
+                                user: user.email,
+                                timestamp: new Date().toISOString(),
+                                details: `B.Tech Student signed in via Google OAuth`
+                            });
+                        } catch (err) { }
+
+                        AppState.updateAuthUI();
+                        alert("Login Successful");
+                        window.location.hash = '#/';
+                    } catch (error) {
+                        console.error(error);
+                    }
+                } else {
+                    // Mock Mode Google Auth bypass
+                    const mockUser = {
+                        username: "GoogleScholar",
+                        email: "google-scholar@college.edu",
+                        college: "MIT Bombay"
+                    };
+                    AppState.currentUser = mockUser;
+                    localStorage.setItem('ece-current-user', JSON.stringify(mockUser));
+
+                    AppState.updateAuthUI();
+                    alert("Login Successful");
+                    window.location.hash = '#/';
+                }
+            });
+        }
     }
-    
+
     if (window.lucide) window.lucide.createIcons();
 };
 
