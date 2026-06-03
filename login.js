@@ -430,7 +430,6 @@ await setDoc(
                 }
             });
         }
-    }
 
     if (window.lucide) window.lucide.createIcons();
 };
