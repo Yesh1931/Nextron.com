@@ -7,13 +7,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA4Xd4LMrMAOAMk-euuDY6zd4jfcmtzQ5U",
-  authDomain: "nextron-48514.firebaseapp.com",
-  projectId: "nextron-48514",
-  storageBucket: "nextron-48514.appspot.com",
-  messagingSenderId: "93642127644",
-  appId: "1:93642127644:web:38a9ceb2aa1252f8dc62d9",
-  measurementId: "G-EL09LP2BNN"
+  apiKey: "AIzaSyCqPgP4tDJPkpJWRZUBiqdL2HVbzQpyXHg",
+  authDomain: "nextron-ea63e.firebaseapp.com",
+  projectId: "nextron-ea63e",
+  storageBucket: "nextron-ea63e.firebasestorage.app",
+  messagingSenderId: "816103811146",
+  appId: "1:816103811146:web:12da4a44d04c3cdedd1eb3",
+  measurementId: "G-8SCE05W5J4"
 };
 
 const app = initializeApp(firebaseConfig);
