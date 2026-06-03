@@ -265,17 +265,61 @@ export const mount = () => {
         if (linkToSignin) linkToSignin.addEventListener('click', () => tabSignin.click());
 
         // Form submissions
-        formSignin.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const username = document.getElementById('login-signin-username').value.trim();
-            const password = document.getElementById('login-signin-password').value;
+        formSignup.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            const success = AppState.loginUser(username, password);
-            if (success) {
-                // Instantly navigate to home on successful authentication!
-                window.location.hash = '#/';
-            }
-        });
+    const username = document.getElementById('login-signup-username').value.trim();
+    const email = document.getElementById('login-signup-email').value.trim();
+    const college = document.getElementById('login-signup-college').value.trim();
+    const password = document.getElementById('login-signup-password').value;
+
+    if (password.length < 6) {
+        AppState.showToast(
+            "Password must be at least 6 characters long.",
+            "error"
+        );
+        return;
+    }
+
+    const success = AppState.registerUser(
+        username,
+        email,
+        password,
+        college
+    );
+
+    if (success) {
+
+        try {
+            await setDoc(
+                    doc(db, "users", crypto.randomUUID())                
+                {
+                    name: username,
+                    email: email,
+                    college: college,
+                    status: "active",
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
+                }
+            );
+
+            await addDoc(
+                collection(db, "activityLogs"),
+                {
+                    action: "User Registration",
+                    user: email,
+                    timestamp: new Date().toISOString(),
+                    details: `${username} registered a new account`
+                }
+            );
+
+        } catch (err) {
+            console.error(err);
+        }
+
+        window.location.hash = '#/';
+    }
+});
 
         formSignup.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -307,11 +351,15 @@ export const mount = () => {
 
                         await setDoc(
                             doc(db, "users", user.uid),
-                            {
-                                name: user.displayName,
-                                email: user.email,
-                                photo: user.photoURL,
-                                createdAt: new Date()
+                            {{
+    name: user.displayName,
+    email: user.email,
+    photo: user.photoURL,
+    college: college,
+    status: "active",
+    createdAt: new Date().toISOString(),
+    lastLogin: new Date().toISOString()
+}
                             },
                             { merge: true }
                         );
