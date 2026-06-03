@@ -3,8 +3,8 @@
  */
 
 import { AppState } from './app.js';
-import { auth, db, isFirebaseActive } from "./Firebase.js";
-import {
+import { auth, db } from "./Firebase.js";
+    import {
     GoogleAuthProvider,
     signInWithPopup,
     onAuthStateChanged
@@ -300,8 +300,8 @@ export const mount = () => {
         const googleLoginBtn = document.getElementById('googleLogin');
         if (googleLoginBtn) {
             googleLoginBtn.addEventListener('click', async () => {
-                if (isFirebaseActive) {
-                    try {
+        if (auth && db) {
+            try {
                         const result = await signInWithPopup(auth, provider);
                         const user = result.user;
 
