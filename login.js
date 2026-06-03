@@ -3,12 +3,12 @@
  */
 
 import { AppState } from './app.js';
-import { auth, db } from "./Firebase.js";
-    import {
+import { auth, db } from "./firebase-admin.js";
+import {
     GoogleAuthProvider,
     signInWithPopup,
     onAuthStateChanged
-} from "firebase/auth";
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 import {
     doc,
@@ -16,7 +16,7 @@ import {
     getDoc,
     collection,
     addDoc
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
 
@@ -265,61 +265,24 @@ export const mount = () => {
         if (linkToSignin) linkToSignin.addEventListener('click', () => tabSignin.click());
 
         // Form submissions
-        formSignup.addEventListener('submit', async (e) => {
-    e.preventDefault();
+        formSignin.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-signin-username').value.trim();
+            const password = document.getElementById('login-signin-password').value;
 
-    const username = document.getElementById('login-signup-username').value.trim();
-    const email = document.getElementById('login-signup-email').value.trim();
-    const college = document.getElementById('login-signup-college').value.trim();
-    const password = document.getElementById('login-signup-password').value;
+            const success = AppState.loginUser(username, password);
+            if (success) {
+                // Instantly navigate to home on successful authentication!
+                window.location.hash = '#/';
+            }
+        });
 
-    if (password.length < 6) {
-        AppState.showToast(
-            "Password must be at least 6 characters long.",
-            "error"
-        );
-        return;
-    }
-
-    const success = AppState.registerUser(
-        username,
-        email,
-        password,
-        college
-    );
-
-    if (success) {
-
-        try {
-            await setDoc(
-                    doc(db, "users", crypto.randomUUID()),
-                {
-                    name: username,
-                    email: email,
-                    college: college,
-                    status: "active",
-                    createdAt: new Date().toISOString(),
-                    lastLogin: new Date().toISOString()
-                }
-            );
-
-            await addDoc(
-                collection(db, "activityLogs"),
-                {
-                    action: "User Registration",
-                    user: email,
-                    timestamp: new Date().toISOString(),
-                    details: `${username} registered a new account`
-                }
-            );
-
-        } catch (err) {
-            console.error(err);
-        }
-
-        window.location.hash = '#/';
-    }
-});
+        formSignup.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-signup-username').value.trim();
+            const email = document.getElementById('login-signup-email').value.trim();
+            const college = document.getElementById('login-signup-college').value.trim();
+            const password = document.getElementById('login-signup-password').value;
 
             if (password.length < 6) {
                 AppState.showToast("Password must be at least 6 characters long.", "error");
@@ -334,53 +297,26 @@ export const mount = () => {
         });
 
         // Google Login Listener
-const googleLoginBtn = document.getElementById('googleLogin');
+        const googleLoginBtn = document.getElementById('googleLogin');
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', async () => {
+                const { isFirebaseActive } = await import('../firebase.js');
+                if (isFirebaseActive) {
+                    try {
+                        const result = await signInWithPopup(auth, provider);
+                        const user = result.user;
 
-if (googleLoginBtn) {
-    googleLoginBtn.addEventListener('click', async () => {
-        try {
+                        await setDoc(
+                            doc(db, "users", user.uid),
+                            {
+                                name: user.displayName,
+                                email: user.email,
+                                photo: user.photoURL,
+                                createdAt: new Date()
+                            },
+                            { merge: true }
+                        );
 
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-
-            await setDoc(
-                doc(db, "users", user.uid),
-                {
-                    name: user.displayName,
-                    email: user.email,
-                    photo: user.photoURL,
-                    status: "active",
-                    lastLogin: new Date().toISOString()
-                },
-                { merge: true }
-            );
-
-            AppState.currentUser = {
-                username: user.displayName,
-                email: user.email,
-                college: "Google Scholar"
-            };
-
-            localStorage.setItem(
-                'ece-current-user',
-                JSON.stringify(AppState.currentUser)
-            );
-
-            await addDoc(collection(db, "activityLogs"), {
-                action: "User Login",
-                user: user.email,
-                timestamp: new Date().toISOString(),
-                details: "Signed in using Google"
-            });
-
-            AppState.updateAuthUI();
-            window.location.hash = '#/';
-
-        } catch (error) {
-            console.error(error);
-        }
-    });
-}
                         // Save to local student session
                         let college = "Google Scholar";
                         let username = user.displayName || user.email.split('@')[0];
@@ -399,6 +335,7 @@ if (googleLoginBtn) {
                             email: user.email,
                             college: college
                         };
+                        localStorage.setItem('ece-current-user', JSON.stringify(AppState.currentUser));
 
                         // Add activity log
                         try {
@@ -432,6 +369,7 @@ if (googleLoginBtn) {
                 }
             });
         }
+    }
 
     if (window.lucide) window.lucide.createIcons();
 };
