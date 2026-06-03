@@ -350,16 +350,15 @@ export const mount = () => {
                         const user = result.user;
 
                         await setDoc(
-                            doc(db, "users", user.uid),
-                            {{
-    name: user.displayName,
-    email: user.email,
-    photo: user.photoURL,
-    college: college,
-    status: "active",
-    createdAt: new Date().toISOString(),
-    lastLogin: new Date().toISOString()
-}
+    doc(db, "users", user.uid),
+    {
+        name: user.displayName,
+        email: user.email,
+        photo: user.photoURL,
+        createdAt: new Date()
+    },
+    { merge: true }
+);
                             },
                             { merge: true }
                         );
