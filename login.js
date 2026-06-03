@@ -359,10 +359,6 @@ export const mount = () => {
     },
     { merge: true }
 );
-                            },
-                            { merge: true }
-                        );
-
                         // Save to local student session
                         let college = "Google Scholar";
                         let username = user.displayName || user.email.split('@')[0];
