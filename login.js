@@ -334,7 +334,22 @@ export const mount = () => {
                             email: user.email,
                             college: college
                         };
-                        localStorage.setItem('ece-current-user', JSON.stringify(AppState.currentUser));
+                        import {
+  doc,
+  setDoc
+} from "firebase/firestore";
+
+await setDoc(
+  doc(db,"users",user.uid),
+  {
+      name:user.name,
+      email:user.email,
+      college:user.college,
+      status:"active",
+      createdAt:new Date(),
+      lastLogin:new Date()
+  }
+);
 
                         // Add activity log
                         try {
