@@ -3,7 +3,7 @@
  */
 
 import { AppState } from './app.js';
-import { auth, db } from "./firebase-admin.js";
+import { auth, db } from "./Firebase.js";
 import {
     GoogleAuthProvider,
     signInWithPopup,
