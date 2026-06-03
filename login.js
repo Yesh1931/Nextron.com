@@ -292,7 +292,7 @@ export const mount = () => {
 
         try {
             await setDoc(
-                    doc(db, "users", crypto.randomUUID())                
+                    doc(db, "users", crypto.randomUUID()),
                 {
                     name: username,
                     email: email,
