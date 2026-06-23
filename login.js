@@ -19,6 +19,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({
+    prompt: 'select_account'
+});
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
