@@ -1,24 +1,37 @@
 /**
- * Firebase Configuration
+ * Nextron - Firebase Configuration & Initialization (Alias for firebase.js compatibility)
  */
-
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCqPgP4tDJPkpJWRZUBiqdL2HVbzQpyXHg",
-  authDomain: "nextron-ea63e.firebaseapp.com",
-  projectId: "nextron-ea63e",
-  storageBucket: "nextron-ea63e.firebasestorage.app",
-  messagingSenderId: "816103811146",
-  appId: "1:816103811146:web:12da4a44d04c3cdedd1eb3",
-  measurementId: "G-8SCE05W5J4"
+    apiKey: "AIzaSyA4Xd4LMrMAOAMk-euuDY6zd4jfcmtzQ5U",
+    authDomain: "nextron-48514.firebaseapp.com",
+    projectId: "nextron-48514",
+    storageBucket: "nextron-48514.firebasestorage.app",
+    messagingSenderId: "93642127644",
+    appId: "1:93642127644:web:38a9ceb2aa1252f8dc62d9",
+    measurementId: "G-EL09LP2BNN"
 };
-
-const app = initializeApp(firebaseConfig);
-
-const auth = getAuth(app);
-const db = getFirestore(app);
-
+// Check if credentials have been replaced
+export const isFirebaseActive =
+    firebaseConfig.apiKey &&
+    firebaseConfig.apiKey !== "[GCP_API_KEY]" &&
+    firebaseConfig.apiKey.trim() !== "[GCP_API_KEY]";
+let app = null;
+let auth = null;
+let db = null;
+if (isFirebaseActive) {
+    try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        console.log("⚡ Firebase successfully initialized and connected to Firestore.");
+    } catch (err) {
+        console.error("❌ Failed to initialize Firebase: ", err);
+    }
+} else {
+    console.warn("⚠️ Firebase configuration missing. ECE Platform running in LOCAL MOCK MODE (localStorage).");
+}
 export { app, auth, db };
